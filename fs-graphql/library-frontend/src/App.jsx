@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Authors from './components/Authors'
-import Books from './components/Books'
+import Book from './components/Book'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -13,7 +13,7 @@ const App = () => {
       </div>
 
       <Authors show={page === 'authors'} />
-      <Books show={page === 'books'} />
+      <Book show={page === 'books'} />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client/react'
 import { ALL_BOOKS } from '../queries'
 
-const Books = (props) => {
+const Book = (props) => {
   const result = useQuery(ALL_BOOKS)
 
   if (!props.show) {
@@ -41,4 +41,4 @@ const Books = (props) => {
   )
 }
 
-export default Books
+export default Book
