@@ -5,15 +5,30 @@ const resolvers = {
   Query: {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
-    allBooks: async () => {
-      // author/genre filters are not required to work yet
-      return Book.find({}).populate('author')
+    allBooks: async (root, args) => {
+      let filter = {}
+
+      if (args.author) {
+        const author = await Author.findOne({ name: args.author })
+        if (!author) {
+          return []
+        }
+        filter.author = author._id
+      }
+
+      if (args.genre) {
+        filter.genres = { $in: [args.genre] }
+      }
+
+      return Book.find(filter).populate('author')
     },
     allAuthors: async () => Author.find({}),
   },
   Author: {
-    // bookCount does not have to work yet
-    bookCount: () => 0,
+    bookCount: async (root) => {
+      const books = await Book.find({ author: root._id })
+      return books.length
+    },
   },
   Mutation: {
     addBook: async (root, args) => {
@@ -30,8 +45,16 @@ const resolvers = {
       return book.populate('author')
     },
     editAuthor: async (root, args) => {
-      // does not have to work yet
-      return null
+      const author = await Author.findOne({ name: args.name })
+
+      if (!author) {
+        return null
+      }
+
+      author.born = args.setBornTo
+      await author.save()
+
+      return author
     },
   },
 }
