@@ -5,13 +5,17 @@ import { ALL_BOOKS } from '../queries'
 const Book = (props) => {
   const [genre, setGenre] = useState(null)
 
-  const result = useQuery(ALL_BOOKS)
+  const result = useQuery(ALL_BOOKS, {
+    variables: { genre },
+  })
+
+  const allBooksResult = useQuery(ALL_BOOKS)
 
   if (!props.show) {
     return null
   }
 
-  if (result.loading) {
+  if (result.loading || allBooksResult.loading) {
     return <div>loading...</div>
   }
 
@@ -21,11 +25,9 @@ const Book = (props) => {
 
   const books = result.data.allBooks
 
-  const genres = [...new Set(books.flatMap((b) => b.genres))]
-
-  const filteredBooks = genre
-    ? books.filter((b) => b.genres.includes(genre))
-    : books
+  const genres = allBooksResult.data
+    ? [...new Set(allBooksResult.data.allBooks.flatMap((b) => b.genres))]
+    : []
 
   return (
     <div>
@@ -42,7 +44,7 @@ const Book = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {filteredBooks.map((b) => (
+          {books.map((b) => (
             <tr key={b.title}>
               <td>{b.title}</td>
               <td>{b.author.name}</td>
