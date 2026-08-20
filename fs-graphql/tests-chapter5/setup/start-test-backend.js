@@ -19,7 +19,6 @@ const start = async () => {
     },
     stdio: ['pipe', 'pipe', 'pipe'],
   })
-
   serverProcess.stdout.on('data', (data) => {
     const output = data.toString()
     process.stdout.write(output)
@@ -39,5 +38,4 @@ const start = async () => {
     mongoServer.stop()
   })
 }
-
 start()

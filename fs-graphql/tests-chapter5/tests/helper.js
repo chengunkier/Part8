@@ -35,7 +35,6 @@ const initialBooks = [
     genres: ['classic', 'crime'],
   },
 ]
-
 const gql = async (request, query, variables, token) => {
   const headers = token ? { Authorization: `Bearer ${token}` } : {}
   const response = await request.post(GRAPHQL_URL, {
@@ -75,7 +74,6 @@ const seedDatabase = async (request) => {
       token,
     )
   }
-
   // Set birth years for known authors
   const authorBirthYears = [
     { name: 'Robert Martin', setBornTo: 1952 },
