@@ -20,6 +20,11 @@ const App = () => {
     setPage('authors')
   }
 
+  const handleLogin = (newToken) => {
+    setToken(newToken)
+    setPage('authors')
+  }
+
   return (
     <div>
       <div>
@@ -39,7 +44,7 @@ const App = () => {
       <Authors show={page === 'authors'} token={token} />
       <Book show={page === 'books'} />
       <NewBook show={page === 'add'} />
-      <LoginForm show={page === 'login'} setToken={setToken} />
+      <LoginForm show={page === 'login' && !token} setToken={handleLogin} />
       <Recommendations show={page === 'recommend'} />
     </div>
   )

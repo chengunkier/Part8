@@ -2,8 +2,11 @@ import { useQuery } from '@apollo/client/react'
 import { ALL_BOOKS, ME } from '../queries'
 
 const Recommendations = (props) => {
-  const userResult = useQuery(ME)
-  const booksResult = useQuery(ALL_BOOKS)
+  const userResult = useQuery(ME, {
+    skip: !props.show,
+    fetchPolicy: 'network-only',
+  })
+  const booksResult = useQuery(ALL_BOOKS, { skip: !props.show })
 
   if (!props.show) {
     return null
