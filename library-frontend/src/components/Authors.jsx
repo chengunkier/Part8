@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { useMutation } from '@apollo/client'
-import { EDIT_AUTHOR, ALL_AUTHORS } from '../queries'
+import { useQuery, useMutation } from '@apollo/client/react'
+import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries'
 
-const Authors = ({ authors }) => {
+const Authors = ({ token }) => {
+  const result = useQuery(ALL_AUTHORS)
   const [name, setName] = useState('')
   const [born, setBorn] = useState('')
 
@@ -10,15 +11,16 @@ const Authors = ({ authors }) => {
     refetchQueries: [{ query: ALL_AUTHORS }],
   })
 
-  const submit = async (event) => {
+  if (result.loading) {
+    return <div>loading...</div>
+  }
+
+  const authors = result.data.allAuthors
+
+  const submit = (event) => {
     event.preventDefault()
 
-    await editAuthor({
-      variables: {
-        name,
-        setBornTo: Number(born),
-      },
-    })
+    editAuthor({ variables: { name, setBornTo: Number(born) } })
 
     setName('')
     setBorn('')
@@ -26,62 +28,52 @@ const Authors = ({ authors }) => {
 
   return (
     <div>
-      <h2>Authors</h2>
+      <h2>authors</h2>
 
       <table>
-        <thead>
+        <tbody>
           <tr>
             <th></th>
             <th>born</th>
             <th>books</th>
           </tr>
-        </thead>
-
-        <tbody>
-          {authors.map((author) => (
-            <tr key={author.name}>
-              <td>{author.name}</td>
-              <td>{author.born}</td>
-              <td>{author.bookCount}</td>
+          {authors.map((a) => (
+            <tr key={a.id}>
+              <td>{a.name}</td>
+              <td>{a.born}</td>
+              <td>{a.bookCount}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <h3>Set birth year</h3>
-
-      <form onSubmit={submit}>
+      {token && (
         <div>
-          <label>
-            name
-            <select
-              value={name}
-              onChange={({ target }) => setName(target.value)}
-            >
-              <option value="">select author</option>
-
-              {authors.map((author) => (
-                <option key={author.name} value={author.name}>
-                  {author.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <h2>Set birthyear</h2>
+          <form onSubmit={submit}>
+            <div>
+              name
+              <select value={name} onChange={({ target }) => setName(target.value)}>
+                <option value="">select author</option>
+                {authors.map((a) => (
+                  <option key={a.id} value={a.name}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              born{' '}
+              <input
+                type="number"
+                value={born}
+                onChange={({ target }) => setBorn(target.value)}
+              />
+            </div>
+            <button type="submit">update author</button>
+          </form>
         </div>
-
-        <div>
-          <label>
-            born
-            <input
-              type="number"
-              value={born}
-              onChange={({ target }) => setBorn(target.value)}
-            />
-          </label>
-        </div>
-
-        <button type="submit">update author</button>
-      </form>
+      )}
     </div>
   )
 }
