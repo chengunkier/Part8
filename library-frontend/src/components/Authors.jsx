@@ -1,4 +1,29 @@
+import { useState } from 'react'
+import { useMutation } from '@apollo/client'
+import { EDIT_AUTHOR, ALL_AUTHORS } from '../queries'
+
 const Authors = ({ authors }) => {
+  const [name, setName] = useState('')
+  const [born, setBorn] = useState('')
+
+  const [editAuthor] = useMutation(EDIT_AUTHOR, {
+    refetchQueries: [{ query: ALL_AUTHORS }],
+  })
+
+  const submit = async (event) => {
+    event.preventDefault()
+
+    await editAuthor({
+      variables: {
+        name,
+        setBornTo: Number(born),
+      },
+    })
+
+    setName('')
+    setBorn('')
+  }
+
   return (
     <div>
       <h2>Authors</h2>
@@ -22,6 +47,33 @@ const Authors = ({ authors }) => {
           ))}
         </tbody>
       </table>
+
+      <h3>Set birth year</h3>
+
+      <form onSubmit={submit}>
+        <div>
+          <label>
+            name
+            <input
+              value={name}
+              onChange={({ target }) => setName(target.value)}
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            born
+            <input
+              type="number"
+              value={born}
+              onChange={({ target }) => setBorn(target.value)}
+            />
+          </label>
+        </div>
+
+        <button type="submit">update author</button>
+      </form>
     </div>
   )
 }
