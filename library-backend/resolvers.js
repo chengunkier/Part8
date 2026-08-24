@@ -11,8 +11,28 @@ const resolvers = {
       return Author.countDocuments({})
     },
 
-    allBooks: async () => {
-      return Book.find({}).populate('author')
+    allBooks: async (root, args) => {
+      let books
+
+      if (args.author) {
+        const author = await Author.findOne({ name: args.author })
+
+        if (!author) {
+          return []
+        }
+
+        books = await Book.find({ author: author._id }).populate('author')
+      } else {
+        books = await Book.find({}).populate('author')
+      }
+
+      if (args.genre) {
+        books = books.filter((book) =>
+          book.genres.includes(args.genre)
+        )
+      }
+
+      return books
     },
 
     allAuthors: async () => {
@@ -20,23 +40,19 @@ const resolvers = {
     }
   },
 
-  Author: {
-    bookCount: async () => {
-      return 0
-    }
-  },
-
-  Book: {
-    author: async (root) => {
-      return Author.findById(root.author)
-    }
-  },
-
   Mutation: {
     addBook: async (root, args) => {
-      const author = await Author.findOne({
+      let author = await Author.findOne({
         name: args.author
       })
+
+      if (!author) {
+        author = new Author({
+          name: args.author
+        })
+
+        await author.save()
+      }
 
       const book = new Book({
         title: args.title,

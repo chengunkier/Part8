@@ -3,8 +3,7 @@ const mongoose = require('mongoose')
 const schema = new mongoose.Schema({
   title: {
     type: String,
-    required: true,
-    minlength: 5
+    required: true
   },
   published: {
     type: Number,
