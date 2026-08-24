@@ -35,7 +35,6 @@ const resolvers = {
 
   Mutation: {
     addBook: async (root, args, context) => {
-      // 1. Check if user is authenticated via context
       const currentUser = context.currentUser
       if (!currentUser) {
         throw new GraphQLError('not authenticated', {
@@ -70,7 +69,6 @@ const resolvers = {
     },
 
     editAuthor: async (root, args, context) => {
-      // 1. Check if user is authenticated via context
       const currentUser = context.currentUser
       if (!currentUser) {
         throw new GraphQLError('not authenticated', {
@@ -95,9 +93,9 @@ const resolvers = {
     },
 
     createUser: async (root, args) => {
-      const user = new User({ 
-        username: args.username, 
-        favoriteGenre: args.favoriteGenre 
+      const user = new User({
+        username: args.username,
+        favoriteGenre: args.favoriteGenre
       })
 
       try {
@@ -112,7 +110,6 @@ const resolvers = {
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
 
-      // Assuming a hardcoded password 'secret' for all users
       if (!user || args.password !== 'secret') {
         throw new GraphQLError('wrong credentials', {
           extensions: { code: 'BAD_USER_INPUT' }
@@ -125,7 +122,17 @@ const resolvers = {
       }
 
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
-    }
+    },
+
+    _resetDatabase: async () => {
+      if (process.env.NODE_ENV !== 'test') {
+        throw new GraphQLError('_resetDatabase is only available in test mode')
+      }
+      await Author.deleteMany({})
+      await Book.deleteMany({})
+      await User.deleteMany({})
+      return true
+    },
   }
 }
 

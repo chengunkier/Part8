@@ -29,6 +29,8 @@ const typeDefs = /* GraphQL */ `
     ): Book!
 
     editAuthor(name: String!, setBornTo: Int!): Author
+
+    _resetDatabase: Boolean
   }
 `
 
