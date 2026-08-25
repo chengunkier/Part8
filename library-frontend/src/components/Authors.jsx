@@ -15,6 +15,10 @@ const Authors = ({ token }) => {
     return <div>loading...</div>
   }
 
+  if (result.error) {
+    return <div>error loading authors: {result.error.message}</div>
+  }
+
   const authors = result.data.allAuthors
 
   const submit = (event) => {
@@ -52,8 +56,10 @@ const Authors = ({ token }) => {
           <h2>Set birthyear</h2>
           <form onSubmit={submit}>
             <div>
-              name
+              <label htmlFor="name">name</label>{' '}
               <select
+                id="name"
+                name="name"
                 value={name}
                 onChange={({ target }) => setName(target.value)}
               >
@@ -66,8 +72,9 @@ const Authors = ({ token }) => {
               </select>
             </div>
             <div>
-              born{' '}
+              <label htmlFor="born">born</label>{' '}
               <input
+                id="born"
                 type="number"
                 value={born}
                 onChange={({ target }) => setBorn(target.value)}
